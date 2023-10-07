@@ -27,7 +27,7 @@ class DoctorViewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'role', 'department']
+        fields = ['id', 'name', 'email', 'department']
     
     def get_department(self, obj):
         department = obj.department.get()
@@ -42,7 +42,7 @@ class PatientViewSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'name', 'email', 'role', 'record']
+        fields = ['id', 'name', 'email', 'record']
     
     def get_record(self, obj):
         record = obj.patient_record.get()

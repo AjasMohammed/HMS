@@ -17,7 +17,7 @@ class DoctorsView(APIView):
     def get(self, request):
         doctors = User.objects.filter(groups__name='Doctors')
         serializer = ViewUsers(doctors, many=True)
-        return Response({"data": serializer.data})
+        return Response(serializer.data)
 
 
 class PatientView(APIView):
@@ -26,7 +26,7 @@ class PatientView(APIView):
     def get(self, request):
         patients = User.objects.filter(groups__name='Patients')
         serializer = ViewUsers(patients, many=True)
-        return Response({"data": serializer.data})
+        return Response(serializer.data)
 
 
 @api_view(['GET', 'PATCH', 'DELETE'])
@@ -35,7 +35,7 @@ def view_doctor_info(request, pk):
     user = User.objects.get(pk=pk)
     if request.method == 'GET':
         serializer = DoctorViewSerializer(user)
-        return Response({"data": serializer.data}, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == 'PATCH':
         serializer = UserSerializer(user, data = request.data, partial=True)
@@ -54,13 +54,9 @@ def view_patient_info(request, pk):
     user = User.objects.get(pk=pk)
     if request.method == 'GET':
         serializer = UserSerializer(user)
-        print(request.user.name)
-        print(request.user.department.get().id)
         p = User.objects.get(pk=pk)
-        print(p.name)
-        print(p.patient_record.get().department_id.id)
         
-        return Response({"data": serializer.data}, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     elif request.method == 'PATCH':
         serializer = UserSerializer(user, data = request.data, partial=True)
