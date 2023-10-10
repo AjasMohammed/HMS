@@ -1,59 +1,25 @@
 from rest_framework.response import Response
 from .models import User
-from django.contrib.auth import authenticate, login
 from rest_framework.views import APIView
 from rest_framework import status
 from .serializers import UserSerializer, LogInSerializer
 
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from rest_framework.permissions import AllowAny, IsAuthenticated
-
-
-def get_tokens_for_user(user):
-    refresh = RefreshToken.for_user(user)
-
-    return {
-        'refresh': str(refresh),
-        'access': str(refresh.access_token),
-    }
-
-
-class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    @classmethod
-    def get_token(cls, user):
-        token = super().get_token(user)
-
-        # Add custom claims
-        token['name'] = user.name
-        # ...
-
-        return token
-    
-class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
-
 
 
 class LoginUser(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [AllowAny]
     def post(self, request):
-        try:
-            serializer = LogInSerializer(data=request.data)
-            if serializer.is_valid():
-                email = serializer.validated_data['email']
-                password = serializer.validated_data['password']
-                auth_user = authenticate(request, email=email, password=password)
-                if auth_user:
-                    token = get_tokens_for_user(auth_user)
-                    return Response({'message': 'Successfully Logged In', 'Tokens': token}, status=status.HTTP_200_OK)
-                else:
-                    return Response({'message': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-        except User.DoesNotExist:
-            return Response({'message': "user doesn't exists."}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = LogInSerializer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.validated_data
+            return Response(data=data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
 
 
 class RegisterUser(APIView):
